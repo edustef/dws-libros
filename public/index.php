@@ -8,7 +8,7 @@ use app\controllers\AuthController;
 use app\models\User;
 use edustef\mvcFrame\Application;
 
-$dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
 $config = [
