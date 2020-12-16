@@ -23,7 +23,7 @@ class Cliente extends DatabaseModel
       'apellidos' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 50]],
       'edad' => [self::RULE_REQUIRED, self::RULE_NUMERIC],
       'direccion' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 255]],
-      'telefono' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]],
+      'telefono' => [self::RULE_NUMERIC, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]],
       'email' => [self::RULE_REQUIRED, self::RULE_EMAIL, [self::RULE_MAX, 'max' => 60]],
     ];
   }
