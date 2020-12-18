@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace api\models;
 
 use DateTime;
 use edustef\mvcFrame\DatabaseModel;
@@ -13,25 +13,29 @@ class Prestamo extends DatabaseModel
   public string $fetchaFin = '';
   public string $estado = '';
 
-  public function rules(): array
-  {
-    return [
-      'isbn' => [self::RULE_REQUIRED, self::RULE_UNIQUE, self::RULE_NUMERIC,  [self::RULE_MIN, 'min' => 13, self::RULE_MAX, 'max' => 13]],
-      'dni' => [self::RULE_REQUIRED, self::RULE_UNIQUE, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]],
-      'fecha_inicio' => [self::RULE_REQUIRED],
-      'fecha_fin' => [self::RULE_REQUIRED],
-      'estado' => [],
-    ];
-  }
-
   public function attributes(): array
   {
     return [
-      'isbn' => ['label' => 'ISBN'],
-      'dni' => ['label' => 'DNI'],
-      'fechaInicio' => ['label' => 'Fecha Inicio'],
-      'fechaFin' => ['label' => 'Fecha Fin'],
-      'estado' => ['label' => 'Estado'],
+      'isbn' => [
+        'label' => 'ISBN',
+        'rules' => [self::RULE_REQUIRED, self::RULE_UNIQUE, self::RULE_NUMERIC,  [self::RULE_MIN, 'min' => 13, self::RULE_MAX, 'max' => 13]]
+      ],
+      'dni' => [
+        'label' => 'DNI',
+        'rules' => [self::RULE_REQUIRED, self::RULE_UNIQUE, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
+      ],
+      'fecha_inicio' => [
+        'label' => 'Fecha inicio',
+        'rules' => [self::RULE_REQUIRED]
+      ],
+      'fecha_fin' => [
+        'label' => 'Fecha fin',
+        'rules' => [self::RULE_REQUIRED]
+      ],
+      'estado' => [
+        'label' => 'Estado',
+        'rules' => []
+      ],
     ];
   }
 

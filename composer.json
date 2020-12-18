@@ -1,19 +1,19 @@
 {
-    "name": "edustef/mini-mvc-framework",
-    "description": "My framework",
-    "authors": [
-        {
-            "name": "Eduard Stefan",
-            "email": "eduardstefan290@gmail.com"
-        }
-    ],
-    "require": {
-        "vlucas/phpdotenv": "^5.2",
-        "edustef/php-mvc-framework": "^1.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "app\\": "./src"
-        }
+  "name": "edustef/mini-mvc-framework",
+  "description": "My framework",
+  "authors": [
+    {
+      "name": "Eduard Stefan",
+      "email": "eduardstefan290@gmail.com"
     }
+  ],
+  "require": {
+    "vlucas/phpdotenv": "^5.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "api\\": "./src",
+      "edustef\\mvcFrame\\": "./src/core"
+    }
+  }
 }

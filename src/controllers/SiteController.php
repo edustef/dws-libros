@@ -1,31 +1,32 @@
 <?php
 
-namespace app\controllers;
+namespace api\controllers;
 
 use edustef\mvcFrame\Controller;
 use edustef\mvcFrame\Request;
+use edustef\mvcFrame\Response;
+use api\models\Cliente;
 
 class SiteController extends Controller
 {
 
-  public function home()
+  public function getClientes(Request $request, Response $response)
   {
-    $params = [
-      'name' => 'bla bla bla'
-    ];
-
-    return $this->render('home', $params);
+    return $response->json(Cliente::findAll());
   }
 
-  public function contact(Request $request)
+  public function postCliente(Request $request, Response $response)
   {
-    if ($request->isPost()) {
-      return  'handle contact';
-    }
-    $params = [
-      'name' => 'bla bla bla'
-    ];
+    $cliente = new Cliente();
+    $cliente->loadData($request->getBody());
 
-    return $this->render('contact', $params);
+    if ($cliente->validate() && $cliente->save()) {
+      return $response->json($cliente);
+    }
+  }
+
+  public function deleteCliente(Request $request, Response $response)
+  {
+    return $response->json(['delete' => 'hello']);
   }
 }

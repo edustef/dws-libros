@@ -1,10 +1,11 @@
 <?php
 
-namespace app\models;
+namespace api\models;
 
 use edustef\mvcFrame\DatabaseModel;
+use JsonSerializable;
 
-class Cliente extends DatabaseModel
+class Cliente extends DatabaseModel implements JsonSerializable
 {
   public string $dni = '';
   public string $nombre = '';
@@ -15,29 +16,37 @@ class Cliente extends DatabaseModel
   public string $telefono = '';
   public string $email = '';
 
-  public function rules(): array
-  {
-    return [
-      'dni' => [self::RULE_REQUIRED, self::RULE_UNIQUE, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]],
-      'nombre' => [self::RULE_REQUIRED,  [self::RULE_MAX, 'max' => 50]],
-      'apellidos' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 50]],
-      'edad' => [self::RULE_REQUIRED, self::RULE_NUMERIC],
-      'direccion' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 255]],
-      'telefono' => [self::RULE_NUMERIC, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]],
-      'email' => [self::RULE_REQUIRED, self::RULE_EMAIL, [self::RULE_MAX, 'max' => 60]],
-    ];
-  }
-
   public function attributes(): array
   {
     return [
-      'dni' => ['label' => 'DNI'],
-      'nombre' => ['label' => 'Nombre'],
-      'apellidos' => ['label' => 'Apellidos'],
-      'edad' => ['label' => 'Edad'],
-      'direccion' => ['label' => 'Direccion'],
-      'telefono' => ['label' => 'Telefono'],
-      'email' => ['label' => 'Email']
+      'dni' => [
+        'label' => 'DNI',
+        'rules' => [self::RULE_REQUIRED, self::RULE_UNIQUE, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
+      ],
+      'nombre' => [
+        'label' => 'Nombre',
+        'rules' => [self::RULE_REQUIRED,  [self::RULE_MAX, 'max' => 50]]
+      ],
+      'apellidos' => [
+        'label' => 'Apellidos',
+        'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 50]]
+      ],
+      'edad' => [
+        'label' => 'Edad',
+        'rules' => [self::RULE_REQUIRED, self::RULE_NUMERIC]
+      ],
+      'direccion' => [
+        'label' => 'Direccion',
+        'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 255]]
+      ],
+      'telefono' => [
+        'label' => 'Telefono',
+        'rules' => [self::RULE_NUMERIC, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
+      ],
+      'email' => [
+        'label' => 'Email',
+        'rules' => [self::RULE_REQUIRED, self::RULE_EMAIL, [self::RULE_MAX, 'max' => 60]]
+      ]
     ];
   }
 
@@ -49,5 +58,24 @@ class Cliente extends DatabaseModel
   public function primaryKey(): string
   {
     return 'dni';
+  }
+
+  public static function getNames()
+  {
+    $tableName = self::tableName();
+    $stmnt = self::prepare("SELECT nombre FROM " . $tableName);
+    $stmnt->execute();
+    return $stmnt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  public function jsonSerialize()
+  {
+    $jsonData = [];
+    foreach ($this->attributes() as $attribute => $attributeData) {
+      $jsonData['data'][$attribute] = $this->{$attribute};
+      $jsonData['dataForHTML'][$attribute] = $attributeData['label'];
+    }
+
+    return $jsonData;
   }
 }
