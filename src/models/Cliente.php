@@ -59,11 +59,6 @@ class Cliente extends DatabaseModel implements JsonSerializable
     return 'Cliente';
   }
 
-  public function primaryKey(): string
-  {
-    return 'dni';
-  }
-
   public static function getNames()
   {
     $tableName = self::tableName();

@@ -31,25 +31,27 @@ class LibroController extends Controller
     ]);
   }
 
-  public function deleteCliente(Request $request, Response $response)
+  public function deleteLibro(Request $request, Response $response)
   {
-    $where = ['dni' => $request->getBody()['dni']];
-    if (Cliente::delete($where)) {
+    if (Libro::delete($request->getBody())) {
       $response->setStatusCode(204);
       return $response->json(['status' => 'ok', 'Deleted successfully']);
     }
 
-    throw new NotFoundException('No cliente found with that DNI');
+    throw new NotFoundException('No libro found with that DNI');
   }
 
-  public function editCliente(Request $request, Response $response)
+  public function editLibro(Request $request, Response $response)
   {
     $body = $request->getBody();
-    if (Cliente::update($body)) {
+    $where = ['isbn' => $body['isbn']];
+    unset($body['isbn']);
+
+    if (Libro::update($body, $where)) {
       $response->setStatusCode(204);
       return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
     }
 
-    throw new NotFoundException('No cliente found with that DNI');
+    throw new NotFoundException('No libro found with that DNI');
   }
 }

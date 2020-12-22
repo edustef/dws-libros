@@ -5,6 +5,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use api\controllers\ClienteController;
 use api\controllers\LibroController;
+use api\controllers\PrestamoController;
 use edustef\mvcFrame\Application;
 use edustef\mvcFrame\exceptions\ForbiddenException;
 
@@ -31,5 +32,13 @@ $app->router->delete('/clientes', [ClienteController::class, 'deleteCliente']);
 
 $app->router->get('/libros', [LibroController::class, 'getLibros']);
 $app->router->post('/libros', [LibroController::class, 'postLibro']);
+$app->router->put('/libros', [LibroController::class, 'editLibro']);
+$app->router->delete('/libros', [LibroController::class, 'deleteLibro']);
+
+
+$app->router->get('/prestamos', [PrestamoController::class, 'getPrestamos']);
+$app->router->post('/prestamos', [PrestamoController::class, 'postPrestamo']);
+$app->router->put('/prestamos', [PrestamoController::class, 'editPrestamo']);
+$app->router->delete('/prestamos', [PrestamoController::class, 'deletePrestamo']);
 
 $app->run();

@@ -15,7 +15,7 @@ class Libro extends DatabaseModel
   public string $categoria = '';
   public string $imagenPortada = '';
   public string $numEjemplaresTotales = '';
-  public string $numEjemplaresDisponibiles = '';
+  public string $numEjemplaresDisponibles = '';
 
   public function attributes(): array
   {
@@ -32,9 +32,12 @@ class Libro extends DatabaseModel
         'label' => 'subtitulo',
         'rules' => [[self::RULE_MAX, 'max' => 255]]
       ],
-      'descripcion' => [],
-      'autor' => [
+      'descripcion' => [
         'label' => 'descripcion',
+        'rules' => []
+      ],
+      'autor' => [
+        'label' => 'autor',
         'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 50]]
       ],
       'editorial' => [
@@ -53,7 +56,7 @@ class Libro extends DatabaseModel
         'label' => 'Numero ejemplares totales',
         'rules' => [self::RULE_REQUIRED, self::RULE_NUMERIC]
       ],
-      'numEjemplaresDisponibiles' => [
+      'numEjemplaresDisponibles' => [
         'label' => 'Numero ejemplares disponibiles',
         'rules' => [self::RULE_REQUIRED, self::RULE_NUMERIC]
       ],
@@ -63,10 +66,5 @@ class Libro extends DatabaseModel
   public static function tableName(): string
   {
     return 'Libro';
-  }
-
-  public function primaryKey(): string
-  {
-    return 'isbn';
   }
 }

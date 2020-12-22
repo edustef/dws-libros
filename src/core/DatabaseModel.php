@@ -5,7 +5,6 @@ namespace edustef\mvcFrame;
 abstract class DatabaseModel extends Model
 {
   abstract public static function tableName(): string;
-  abstract public function primaryKey(): string;
 
   public function save()
   {

@@ -11,6 +11,7 @@ abstract class Model
   public const RULE_MATCH = 'match';
   public const RULE_UNIQUE = 'unique';
   public const RULE_NUMERIC = 'numeric';
+  public const RULE_FIX = 'fix';
 
   abstract public function attributes(): array;
 
@@ -42,7 +43,7 @@ abstract class Model
           $ruleName = $rule[0];
         }
 
-        if ($ruleName === self::RULE_REQUIRED && !$value) {
+        if ($ruleName === self::RULE_REQUIRED && $value === '') {
           $this->addError($attribute, self::RULE_REQUIRED);
         }
 
@@ -59,7 +60,7 @@ abstract class Model
         }
 
         if ($ruleName === self::RULE_NUMERIC && !is_numeric($value)) {
-          $this->addError($attribute, self::RULE_MAX, $rule);
+          $this->addError($attribute, self::RULE_NUMERIC);
         }
 
         if ($ruleName === self::RULE_MATCH && $value !== $this->{$rule['match']}) {
@@ -112,6 +113,7 @@ abstract class Model
       self::RULE_MAX => 'Max length of this field must be {max}.',
       self::RULE_MATCH => 'This field must match with \'{match}\' field.',
       self::RULE_UNIQUE => 'A record with this \'{unique}\' already exists.',
+      self::RULE_NUMERIC => 'This field must be numeric.',
     ];
 
     return $errorMessages[$ruleName] ?? '';
