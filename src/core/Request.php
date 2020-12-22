@@ -63,13 +63,15 @@ class Request
   public function setBody()
   {
     $body = [];
-    if (self::GET === $_SERVER['REQUEST_METHOD']) {
+    $method = $_SERVER['REQUEST_METHOD'];
+    if ($method === self::GET) {
       foreach (array_keys($_GET) as $key) {
-        $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+        $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_STRING);
       }
+      // $body = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
     } else { // is post
       foreach (array_keys($_POST) as $key) {
-        $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+        $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
       }
     }
 
@@ -78,6 +80,8 @@ class Request
 
   public function getBody(): array
   {
-    return $this->body;
+    $body = $this->body;
+    unset($body['_method']);
+    return $body;
   }
 }

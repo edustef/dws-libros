@@ -22,7 +22,7 @@ class Libro extends DatabaseModel
     return [
       'isbn' => [
         'label' => 'ISBN',
-        'rules' => [self::RULE_REQUIRED, self::RULE_UNIQUE, [self::RULE_MIN, 'min' => 13], [self::RULE_MAX, 'max' => 13]]
+        'rules' => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'tableName' => self::tableName()], [self::RULE_MIN, 'min' => 13], [self::RULE_MAX, 'max' => 13]]
       ],
       'titulo' => [
         'label' => 'titulo',
@@ -45,7 +45,7 @@ class Libro extends DatabaseModel
         'label' => 'categoria',
         'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 50]]
       ],
-      'imagePortada' => [
+      'imagenPortada' => [
         'label' => 'Imagen portada',
         'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 255]]
       ],
@@ -62,11 +62,11 @@ class Libro extends DatabaseModel
 
   public static function tableName(): string
   {
-    return 'Cliente';
+    return 'Libro';
   }
 
   public function primaryKey(): string
   {
-    return 'dni';
+    return 'isbn';
   }
 }

@@ -3,7 +3,8 @@ ini_set('display_errors', 'on');
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use api\controllers\SiteController;
+use api\controllers\ClienteController;
+use api\controllers\LibroController;
 use edustef\mvcFrame\Application;
 use edustef\mvcFrame\exceptions\ForbiddenException;
 
@@ -23,8 +24,12 @@ $app = new Application($config);
 $app->router->get('/', function ($request, $response) {
   throw new ForbiddenException();
 });
-$app->router->get('/clientes', [SiteController::class, 'getClientes']);
-$app->router->post('/clientes', [SiteController::class, 'postCliente']);
-$app->router->delete('/clientes', [SiteController::class, 'deleteCliente']);
+$app->router->get('/clientes', [ClienteController::class, 'getClientes']);
+$app->router->post('/clientes', [ClienteController::class, 'postCliente']);
+$app->router->put('/clientes', [ClienteController::class, 'editCliente']);
+$app->router->delete('/clientes', [ClienteController::class, 'deleteCliente']);
+
+$app->router->get('/libros', [LibroController::class, 'getLibros']);
+$app->router->post('/libros', [LibroController::class, 'postLibro']);
 
 $app->run();

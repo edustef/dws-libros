@@ -21,7 +21,7 @@ class Cliente extends DatabaseModel implements JsonSerializable
     return [
       'dni' => [
         'label' => 'DNI',
-        'rules' => [self::RULE_REQUIRED, self::RULE_UNIQUE, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
+        'rules' => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'tableName' => self::tableName()], [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
       ],
       'nombre' => [
         'label' => 'Nombre',
@@ -35,13 +35,17 @@ class Cliente extends DatabaseModel implements JsonSerializable
         'label' => 'Edad',
         'rules' => [self::RULE_REQUIRED, self::RULE_NUMERIC]
       ],
+      'poblacion' => [
+        'label' => 'poblacion',
+        'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 60]]
+      ],
       'direccion' => [
         'label' => 'Direccion',
         'rules' => [self::RULE_REQUIRED, [self::RULE_MAX, 'max' => 255]]
       ],
       'telefono' => [
         'label' => 'Telefono',
-        'rules' => [self::RULE_NUMERIC, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
+        'rules' => [self::RULE_NUMERIC, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 10]]
       ],
       'email' => [
         'label' => 'Email',
@@ -72,8 +76,7 @@ class Cliente extends DatabaseModel implements JsonSerializable
   {
     $jsonData = [];
     foreach ($this->attributes() as $attribute => $attributeData) {
-      $jsonData['data'][$attribute] = $this->{$attribute};
-      $jsonData['dataForHTML'][$attribute] = $attributeData['label'];
+      $jsonData[$attribute] = $this->{$attribute};
     }
 
     return $jsonData;

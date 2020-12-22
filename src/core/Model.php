@@ -33,7 +33,7 @@ abstract class Model
   public function validate(): bool
   {
     foreach ($this->attributes() as $attribute => $data) {
-      $rules = $data['rules'];
+      $rules = $data['rules'] ?? [];
       $value = $this->{$attribute};
       foreach ($rules as $rule) {
         $ruleName = $rule;
@@ -67,9 +67,8 @@ abstract class Model
         }
 
         if ($ruleName === self::RULE_UNIQUE) {
-          $className = $rule['class'];
+          $tableName = $rule['tableName'];
           $uniqueAttribute = $rule['attribute'] ?? $attribute;
-          $tableName = $className::tableName();
 
           $query = 'SELECT * FROM ' . $tableName . ' WHERE ' . $uniqueAttribute . ' = :attribute';
           $stmnt = Application::$app->database->pdo->prepare($query);
