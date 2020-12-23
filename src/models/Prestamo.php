@@ -20,11 +20,11 @@ class Prestamo extends DatabaseModel
     return [
       'isbn' => [
         'label' => 'ISBN',
-        'rules' => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'tableName' => self::tableName()], self::RULE_NUMERIC,  [self::RULE_MIN, 'min' => 13, self::RULE_MAX, 'max' => 13]]
+        'rules' => [self::RULE_REQUIRED, self::RULE_NUMERIC,  [self::RULE_MIN, 'min' => 13, self::RULE_MAX, 'max' => 13]]
       ],
       'dni' => [
         'label' => 'DNI',
-        'rules' => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'tableName' => self::tableName()], [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
+        'rules' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 10], [self::RULE_MAX, 'max' => 10]]
       ],
       'fechaInicio' => [
         'label' => 'Fecha inicio',
@@ -41,28 +41,25 @@ class Prestamo extends DatabaseModel
     ];
   }
 
-  public function validate(): bool
+  public function save(): bool
   {
-    if (!is_numeric($this->estado) || $this->estado < 0 || $this->estado > self::MAX_ESTADO) {
+    $this->estado = $this->getEstado();
+
+    return parent::save();
+  }
+
+  public function update(array $attributes, array $where = null): bool
+  {
+    if (!isset($attributes['estado']) && isset($attributes['fechaFin'])) {
+      $attributes['estado'] = $this->getEstado($attributes['fechaFin']);
+    }
+
+    if (!$this->isValidEstado($attributes['estado'])) {
       $this->addErrorMessage('estado', 'Estado no es valido!');
       return false;
     }
 
-    try {
-      new DateTime($this->fechaInicio);
-    } catch (\Exception $e) {
-      $this->addErrorMessage('fechaInicio', $e->getMessage());
-      return false;
-    }
-
-    try {
-      new DateTime($this->fechaFin);
-    } catch (\Exception $e) {
-      $this->addErrorMessage('fechaInicio', $e->getMessage());
-      return false;
-    }
-
-    return parent::validate();
+    return parent::update($attributes, $where);
   }
 
   public static function tableName(): string
@@ -74,7 +71,7 @@ class Prestamo extends DatabaseModel
   {
     $tableName = self::tableName();
     $stmnt = self::prepare("
-      SELECT l.titulo, c.nombre, p.fechaInicio, p.fechaFin, p.estado 
+      SELECT l.isbn, c.dni, l.titulo, c.nombre, p.fechaInicio, p.fechaFin, p.estado 
       FROM $tableName p
       INNER JOIN Cliente c USING (dni)
       INNER JOIN Libro l USING (isbn)
@@ -83,5 +80,35 @@ class Prestamo extends DatabaseModel
     $stmnt->execute();
 
     return $stmnt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  public function isValidEstado($estado = null)
+  {
+    $estado = $estado ?? $this->estado;
+
+    return is_numeric($estado) && $estado >= 0 && $estado < self::MAX_ESTADO;
+  }
+
+  public function getEstado($fechaFin = null)
+  {
+    $estado = '0';
+
+    try {
+      $today = new DateTime();
+      $tempFin = new DateTime($fechaFin ?? $this->fechaFin);
+
+      $interval = $tempFin->diff($today);
+
+      if ($interval->y >= 1) {
+        $estado = '3';
+      } else if ($interval->m >= 1) {
+        $estado = '2';
+      }
+    } catch (\Exception $e) {
+      $this->addErrorMessage('fechaInicio', $e->getMessage());
+      return false;
+    }
+
+    return $estado;
   }
 }

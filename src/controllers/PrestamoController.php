@@ -43,19 +43,25 @@ class PrestamoController extends Controller
 
   public function editPrestamo(Request $request, Response $response)
   {
+    $prestamo = new Prestamo();
     $body = $request->getBody();
     $where = [
       'isbn' => $body['isbn'],
       'dni' => $body['dni']
     ];
-    unset($body['isbn']);
-    unset($body['dni']);
+    $prestamo->loadData($body);
 
-    if (Prestamo::update($body, $where)) {
-      $response->setStatusCode(204);
-      return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
+    if ($prestamo->validate(true)) {
+      if ($prestamo->update($body, $where)) {
+        $response->setStatusCode(204);
+        return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
+      }
+
+      throw new NotFoundException('No Prestamo found with that DNI');
     }
 
-    throw new NotFoundException('No Prestamo found with that DNI');
+    return $response->json([
+      'errors' => $prestamo->errors
+    ]);
   }
 }

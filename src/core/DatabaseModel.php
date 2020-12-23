@@ -70,7 +70,7 @@ abstract class DatabaseModel extends Model
     return $stmnt->rowCount() >= 1;
   }
 
-  public static function update(array $attributes, array $where = null): bool
+  public function update(array $attributes, array $where = null): bool
   {
     $tableName = static::tableName();
 
@@ -90,7 +90,6 @@ abstract class DatabaseModel extends Model
     foreach ($attributes as $attribute => $attributeValue) {
       $stmnt->bindValue(":$attribute", $attributeValue);
     }
-
     $stmnt->execute();
     return true;
   }

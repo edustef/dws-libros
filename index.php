@@ -1,5 +1,8 @@
 <?php
 ini_set('display_errors', 'on');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Allow-Access-Origin: application/json');
 
 require_once __DIR__ . '/vendor/autoload.php';
 

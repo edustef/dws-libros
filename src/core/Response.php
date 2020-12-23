@@ -23,9 +23,6 @@ class Response
 
   public function json($data, $statusCode = self::OK)
   {
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Origin: *');
-    header('Allow-Access-Origin: application/json');
     $this->setStatusCode($statusCode);
     return json_encode($data);
   }

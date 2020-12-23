@@ -31,7 +31,7 @@ abstract class Model
     return $this->attributes()[$attribute]['label'];
   }
 
-  public function validate(): bool
+  public function validate($isUpdate = false): bool
   {
     foreach ($this->attributes() as $attribute => $data) {
       $rules = $data['rules'] ?? [];
@@ -43,7 +43,7 @@ abstract class Model
           $ruleName = $rule[0];
         }
 
-        if ($ruleName === self::RULE_REQUIRED && $value === '') {
+        if (!$isUpdate && ($ruleName === self::RULE_REQUIRED && $value === '')) {
           $this->addError($attribute, self::RULE_REQUIRED);
         }
 
@@ -67,7 +67,7 @@ abstract class Model
           $this->addError($attribute, self::RULE_MATCH, ['match' => $this->getLabel($rule['match'])]);
         }
 
-        if ($ruleName === self::RULE_UNIQUE) {
+        if (!$isUpdate && $ruleName === self::RULE_UNIQUE) {
           $tableName = $rule['tableName'];
           $uniqueAttribute = $rule['attribute'] ?? $attribute;
 
