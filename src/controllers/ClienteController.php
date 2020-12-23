@@ -26,6 +26,7 @@ class ClienteController extends Controller
       return $response->json(['status' => 'ok', 'message' => 'Created successfully']);
     }
 
+    $response->setStatusCode(400);
     return $response->json([
       'errors' => $cliente->errors
     ]);

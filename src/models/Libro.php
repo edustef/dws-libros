@@ -3,8 +3,9 @@
 namespace api\models;
 
 use edustef\mvcFrame\DatabaseModel;
+use JsonSerializable;
 
-class Libro extends DatabaseModel
+class Libro extends DatabaseModel implements JsonSerializable
 {
   public string $isbn = '';
   public string $titulo = '';
@@ -66,5 +67,15 @@ class Libro extends DatabaseModel
   public static function tableName(): string
   {
     return 'Libro';
+  }
+
+  public function jsonSerialize()
+  {
+    $jsonData = [];
+    foreach ($this->attributes() as $attribute => $attributeData) {
+      $jsonData[$attribute] = $this->{$attribute};
+    }
+
+    return $jsonData;
   }
 }
