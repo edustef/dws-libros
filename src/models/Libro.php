@@ -69,6 +69,31 @@ class Libro extends DatabaseModel implements JsonSerializable
     return 'Libro';
   }
 
+  public function addEjemplar()
+  {
+    if ($this->numEjemplaresDisponibles < $this->numEjemplaresTotales) {
+      $stmnt = self::prepare("UPDATE Libro SET numEjemplaresDisponibles = numEjemplaresDisponibles + 1 WHERE isbn = :isbn");
+      $stmnt->bindValue(':isbn', $this->isbn);
+      $stmnt->execute();
+
+      return true;
+    }
+
+    return false;
+  }
+
+  public function removeEjemplar()
+  {
+    if ($this->numEjemplaresDisponibles > 0) {
+      $stmnt = self::prepare("UPDATE Libro SET numEjemplaresDisponibles = numEjemplaresDisponibles - 1 WHERE isbn = :isbn");
+      $stmnt->bindValue(':isbn', $this->isbn);
+      $stmnt->execute();
+
+      return true;
+    }
+    return false;
+  }
+
   public function jsonSerialize()
   {
     $jsonData = [];

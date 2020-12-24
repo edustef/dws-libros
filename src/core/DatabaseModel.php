@@ -31,7 +31,6 @@ abstract class DatabaseModel extends Model
     foreach ($where as $key => $value) {
       $stmnt->bindValue(":$key", $value);
     }
-
     $stmnt->execute();
     return $stmnt->fetchObject(static::class);
   }

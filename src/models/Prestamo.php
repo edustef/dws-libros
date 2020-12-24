@@ -43,6 +43,12 @@ class Prestamo extends DatabaseModel
 
   public function save(): bool
   {
+    $libro = Libro::findOne(['isbn' => $this->isbn]);
+    $res = $libro->removeEjemplar();
+    if (!$res) {
+      return false;
+    }
+
     $this->estado = $this->getEstado();
 
     return parent::save();
@@ -58,6 +64,20 @@ class Prestamo extends DatabaseModel
       $this->addErrorMessage('estado', 'Estado no es valido!');
       return false;
     }
+
+    $libro = Libro::findOne(['isbn', $this->isbn]);
+    $libro->removeEjemplar();
+
+    $res = false;
+    switch ($attributes['estado']) {
+      case '0':
+        $res = $libro->addEjemaplar();
+        break;
+      case '1':
+        $res = $libro->removeEjemplar();
+        break;
+    }
+    if (!$res) return false;
 
     return parent::update($attributes, $where);
   }
