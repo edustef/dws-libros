@@ -13,7 +13,17 @@ class LibroController extends Controller
 
   public function getLibros(Request $request, Response $response)
   {
-    return $response->json(Libro::findAll());
+    $body = $request->getBody();
+    $libros = [];
+    
+    if (isset($body['query']) && $body['query'] !== '') {
+      $attributes = ['titulo', 'subtitulo', 'categoria', 'editorial', 'autor'];
+      $value = $body['query'];
+      $libros = Libro::search($attributes, $value);
+    } else {
+      $libros = Libro::findAll();
+    }
+    return $response->json($libros);
   }
 
   public function postLibro(Request $request, Response $response)

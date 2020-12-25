@@ -54,6 +54,21 @@ abstract class DatabaseModel extends Model
     return $stmnt->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, static::class);
   }
 
+  public static function search(array $searchAttributes, string $value)
+  {
+    $tableName = static::tableName();
+    $searchAttributesGlued = implode(', ', $searchAttributes);
+
+    $stmnt = self::prepare("SELECT * FROM $tableName
+      WHERE MATCH ($searchAttributesGlued)
+      AGAINST ('$value' IN NATURAL LANGUAGE MODE)");
+
+    $stmnt->execute();
+
+    return $stmnt->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, static::class);
+  }
+
+
   public static function delete(array $where): bool
   {
     $tableName = static::tableName();
@@ -69,21 +84,17 @@ abstract class DatabaseModel extends Model
     return $stmnt->rowCount() >= 1;
   }
 
-  public function update(array $attributes, array $where = null): bool
+  public function update(array $attributes, array $where): bool
   {
     $tableName = static::tableName();
 
     $params = array_map(fn ($attr) => "$attr=:$attr",  array_keys($attributes));
 
-    if ($where) {
-      $whereQuery = implode(' AND ', array_map(fn ($key) => "$key = :where$key", array_keys($where)));
-      $stmnt = self::prepare("UPDATE $tableName SET " . implode(',', $params) . " WHERE $whereQuery");
+    $whereQuery = implode(' AND ', array_map(fn ($key) => "$key = :where$key", array_keys($where)));
+    $stmnt = self::prepare("UPDATE $tableName SET " . implode(',', $params) . " WHERE $whereQuery");
 
-      foreach ($where as $key => $value) {
-        $stmnt->bindValue(":where$key", $value);
-      }
-    } else {
-      $stmnt = self::prepare("UPDATE $tableName SET " . implode(',', $params));
+    foreach ($where as $key => $value) {
+      $stmnt->bindValue(":where$key", $value);
     }
 
     foreach ($attributes as $attribute => $attributeValue) {

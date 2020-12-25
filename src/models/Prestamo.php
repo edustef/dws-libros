@@ -44,17 +44,29 @@ class Prestamo extends DatabaseModel
   public function save(): bool
   {
     $libro = Libro::findOne(['isbn' => $this->isbn]);
-    $res = $libro->removeEjemplar();
-    if (!$res) {
-      return false;
+    if (!$libro) {
+      $this->addErrorMessage('isbn', 'There are no books in stock');
+    } else {
+      $ok = $libro->removeEjemplar();
+      if (!$ok) {
+        $this->addErrorMessage('isbn', 'There are no more books in stock');
+      }
+    }
+
+    $cliente = Cliente::findOne(['dni' => $this->dni]);
+
+    if (!$cliente) {
+      $this->addErrorMessage('dni', 'No cliente found with that dni');
     }
 
     $this->estado = $this->getEstado();
-
-    return parent::save();
+    if (empty($this->errors)) {
+      return parent::save();
+    }
+    return false;
   }
 
-  public function update(array $attributes, array $where = null): bool
+  public function update(array $attributes, array $where): bool
   {
     if (!isset($attributes['estado']) && isset($attributes['fechaFin'])) {
       $attributes['estado'] = $this->getEstado($attributes['fechaFin']);
@@ -66,18 +78,20 @@ class Prestamo extends DatabaseModel
     }
 
     $libro = Libro::findOne(['isbn', $this->isbn]);
-    $libro->removeEjemplar();
 
-    $res = false;
+    $ok = false;
     switch ($attributes['estado']) {
       case '0':
-        $res = $libro->addEjemaplar();
+        $ok = $libro->addEjemaplar();
         break;
       case '1':
-        $res = $libro->removeEjemplar();
+        $ok = $libro->removeEjemplar();
         break;
     }
-    if (!$res) return false;
+    if (!$ok) {
+      $this->addErrorMessage('isbn', 'There are no more books in stock');
+      return false;
+    }
 
     return parent::update($attributes, $where);
   }

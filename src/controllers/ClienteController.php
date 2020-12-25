@@ -13,6 +13,7 @@ class ClienteController extends Controller
 
   public function getClientes(Request $request, Response $response)
   {
+    
     return $response->json(Cliente::findAll());
   }
 
