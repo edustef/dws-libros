@@ -12,8 +12,10 @@ use api\controllers\PrestamoController;
 use edustef\mvcFrame\Application;
 use edustef\mvcFrame\exceptions\ForbiddenException;
 
-$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+if (file_exists(__DIR__ . '/.env')) {
+  $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
+  $dotenv->load();
+}
 
 $config = [
   'db' => [
