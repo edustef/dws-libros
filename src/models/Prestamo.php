@@ -68,29 +68,25 @@ class Prestamo extends DatabaseModel
 
   public function update(array $attributes, array $where): bool
   {
-    if (!isset($attributes['estado']) && isset($attributes['fechaFin'])) {
+    if (isset($attributes['estado'])) {
+      $libro = Libro::findOne(['isbn' => $this->isbn]);
+
+      $ok = false;
+      switch ($attributes['estado']) {
+        case '1':
+          $ok = $libro->addEjemplar();
+          break;
+        default:
+          $ok = $libro->removeEjemplar();
+          break;
+      }
+
+      if (!$ok) {
+        $this->addErrorMessage('isbn', 'There are no more books in stock');
+        return false;
+      }
+    } else {
       $attributes['estado'] = $this->getEstado($attributes['fechaFin']);
-    }
-
-    if (!$this->isValidEstado($attributes['estado'])) {
-      $this->addErrorMessage('estado', 'Estado no es valido!');
-      return false;
-    }
-
-    $libro = Libro::findOne(['isbn', $this->isbn]);
-
-    $ok = false;
-    switch ($attributes['estado']) {
-      case '0':
-        $ok = $libro->addEjemaplar();
-        break;
-      case '1':
-        $ok = $libro->removeEjemplar();
-        break;
-    }
-    if (!$ok) {
-      $this->addErrorMessage('isbn', 'There are no more books in stock');
-      return false;
     }
 
     return parent::update($attributes, $where);
@@ -101,15 +97,37 @@ class Prestamo extends DatabaseModel
     return 'Prestamo';
   }
 
-  public static function getJoinTable()
+  public static function findAll(array $where = null)
   {
     $tableName = self::tableName();
     $stmnt = self::prepare("
-      SELECT l.isbn, c.dni, l.titulo, c.nombre, p.fechaInicio, p.fechaFin, p.estado 
+      SELECT id, l.isbn, c.dni, l.titulo, c.nombre, p.fechaInicio, p.fechaFin, p.estado 
       FROM $tableName p
       INNER JOIN Cliente c USING (dni)
       INNER JOIN Libro l USING (isbn)
     ");
+
+    $stmnt->execute();
+
+    return $stmnt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  public static function search(array $searchAttributes, string $value)
+  {
+    $sql = "SET @value = :value";
+
+    $stmnt = self::prepare($sql);
+    $stmnt->bindValue(":value", "%$value%", \PDO::PARAM_STR);
+    $stmnt->execute();
+    $tableName = static::tableName();
+    $searchAttributesGlued = implode(' OR ', array_map(fn ($attr) => "$attr LIKE @value", $searchAttributes));
+    $stmnt = self::prepare("
+      SELECT id, l.isbn, c.dni, l.titulo, c.nombre, p.fechaInicio, p.fechaFin, p.estado 
+      FROM $tableName p
+      INNER JOIN Cliente c USING (dni)
+      INNER JOIN Libro l USING (isbn)
+      WHERE $searchAttributesGlued
+      ");
 
     $stmnt->execute();
 

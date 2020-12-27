@@ -56,12 +56,15 @@ abstract class DatabaseModel extends Model
 
   public static function search(array $searchAttributes, string $value)
   {
-    $tableName = static::tableName();
-    $searchAttributesGlued = implode(', ', $searchAttributes);
+    $sql = "SET @value = :value";
 
+    $stmnt = self::prepare($sql);
+    $stmnt->bindValue(":value", "%$value%", \PDO::PARAM_STR);
+    $stmnt->execute();
+    $tableName = static::tableName();
+    $searchAttributesGlued = implode(' OR ', array_map(fn ($attr) => "$attr LIKE @value", $searchAttributes));
     $stmnt = self::prepare("SELECT * FROM $tableName
-      WHERE MATCH ($searchAttributesGlued)
-      AGAINST ('$value' IN NATURAL LANGUAGE MODE)");
+      WHERE $searchAttributesGlued");
 
     $stmnt->execute();
 

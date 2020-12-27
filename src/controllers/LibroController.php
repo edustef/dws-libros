@@ -15,7 +15,7 @@ class LibroController extends Controller
   {
     $body = $request->getBody();
     $libros = [];
-    
+
     if (isset($body['query']) && $body['query'] !== '') {
       $attributes = ['titulo', 'subtitulo', 'categoria', 'editorial', 'autor'];
       $value = $body['query'];
@@ -55,13 +55,15 @@ class LibroController extends Controller
   {
     $body = $request->getBody();
     $where = ['isbn' => $body['isbn']];
-    unset($body['isbn']);
+    $libro = Libro::findOne($where);
 
-    if (Libro::update($body, $where)) {
+    if ($libro->update($body, $where)) {
       $response->setStatusCode(204);
       return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
     }
 
-    throw new NotFoundException('No libro found with that DNI');
+    return $response->json([
+      'errors' => $libro->errors
+    ]);
   }
 }

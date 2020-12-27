@@ -13,7 +13,16 @@ class PrestamoController extends Controller
 
   public function getPrestamos(Request $request, Response $response)
   {
-    return $response->json(Prestamo::getJoinTable());
+    $body = $request->getBody();
+    $prestamos = [];
+
+    if (isset($body['query']) && $body['query'] !== '') {
+      $attributes = ['c.dni', 'p.estado', 'l.titulo', 'c.nombre'];
+      $prestamos = Prestamo::search($attributes, $body['query']);
+    } else {
+      $prestamos = Prestamo::findAll();
+    }
+    return $response->json($prestamos);
   }
 
   public function postPrestamo(Request $request, Response $response)
@@ -45,15 +54,11 @@ class PrestamoController extends Controller
   {
     $body = $request->getBody();
     $where = ['id' => $body['id']];
-    $prestamo = Prestamo::findOne(['id' => $body[$where]]);
+    $prestamo = Prestamo::findOne($where);
 
-    if ($prestamo->validate()) {
-      if ($prestamo->update($body, $where)) {
-        $response->setStatusCode(204);
-        return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
-      }
-
-      throw new NotFoundException('No Prestamo found with that DNI');
+    if ($prestamo->update($body, $where)) {
+      $response->setStatusCode(204);
+      return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
     }
 
     return $response->json([

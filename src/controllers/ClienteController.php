@@ -13,8 +13,17 @@ class ClienteController extends Controller
 
   public function getClientes(Request $request, Response $response)
   {
-    
-    return $response->json(Cliente::findAll());
+    $body = $request->getBody();
+    $clientes = [];
+
+    if (isset($body['query']) && $body['query'] !== '') {
+      $attributes = ['nombre', 'apellidos', 'poblacion', 'telefono', 'email'];
+      $value = $body['query'];
+      $clientes = Cliente::search($attributes, $value);
+    } else {
+      $clientes = Cliente::findAll();
+    }
+    return $response->json($clientes);
   }
 
   public function postCliente(Request $request, Response $response)
@@ -47,11 +56,16 @@ class ClienteController extends Controller
   public function editCliente(Request $request, Response $response)
   {
     $body = $request->getBody();
-    if (Cliente::update($body)) {
+    $where = ['dni' => $body['dni']];
+    $cliente = Cliente::findOne($where);
+
+    if ($cliente->update($body, $where)) {
       $response->setStatusCode(204);
       return $response->json(['status' => 'ok', 'message' => 'Updated successfully']);
     }
 
-    throw new NotFoundException('No cliente found with that DNI');
+    return $response->json([
+      'errors' => $cliente->errors
+    ]);
   }
 }
